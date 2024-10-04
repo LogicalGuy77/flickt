@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, ReactNode } from "react";
 import {
   ConnectionProvider,
   WalletProvider,
@@ -13,7 +13,13 @@ import { clusterApiUrl } from "@solana/web3.js";
 // Default styles that can be overridden by your app
 require("@solana/wallet-adapter-react-ui/styles.css");
 
-export default function WalletConnectionProvider({ children }) {
+interface WalletConnectionProviderProps {
+  children: ReactNode;
+}
+
+export default function WalletConnectionProvider({
+  children,
+}: WalletConnectionProviderProps) {
   // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'
   const network = WalletAdapterNetwork.Devnet;
 
