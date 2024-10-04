@@ -9,6 +9,8 @@ import TestImg from "../../../public/testimg.jpg";
 import Sol from "../../../public/solana.jpg";
 import AddPostComponent from "@/components/AddPostComponent";
 import { FloatingDock } from "@/components/floating-dock";
+import PhantomComponent from "@/components/PhantomComponent";
+
 const Page = () => {
   const postsData = [
     {
@@ -78,6 +80,11 @@ const Page = () => {
       </div>
 
       <div className="fixed top-0 right-0 h-[20%] m-5">
+        <div className="w-[280px] mt-4">
+          <div className="ml-auto flex translate-x-14">
+            <PhantomComponent /> {/* This is where your button is located */}
+          </div>
+        </div>
         <TextRevealCard
           text="NFTs"
           revealText="5 NFTs"

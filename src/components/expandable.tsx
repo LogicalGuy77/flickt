@@ -45,7 +45,7 @@ export default function ExpandableCardDemo() {
                 layoutId={`button-${card.title}-${id}`}
                 href={card.ctaLink}
                 target="_blank"
-                className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-red-500 hover:text-white text-black mt-4 md:mt-0"
+                className="px-4 py-2 text-sm rounded-full font-bold bg-gray-100 hover:bg-red-800 hover:text-white text-black mt-4 md:mt-0"
               >
                 {card.ctaText}
               </motion.a>
