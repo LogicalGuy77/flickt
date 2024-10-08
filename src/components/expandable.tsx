@@ -6,7 +6,7 @@ import lakshya from "../../public/lakshya.jpeg";
 import naman from "../../public/naman.jpeg";
 import GoCute from "../../public/GoCute.png";
 import sid from "../../public/sid.png";
-import matrix from "../../public/matrix.jpg";
+import matrix from "../../public/dummy.webp";
 
 export default function ExpandableCardDemo() {
   const id = useId();
