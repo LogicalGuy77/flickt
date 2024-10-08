@@ -2,6 +2,11 @@
 import Image from "next/image";
 import React, { useId } from "react";
 import { motion } from "framer-motion";
+import lakshya from "../../public/lakshya.jpeg";
+import naman from "../../public/naman.jpeg";
+import GoCute from "../../public/GoCute.png";
+import sid from "../../public/sid.png";
+import matrix from "../../public/matrix.jpg";
 
 export default function ExpandableCardDemo() {
   const id = useId();
@@ -59,37 +64,37 @@ export default function ExpandableCardDemo() {
 
 const cards = [
   {
-    description: "Lana Del Rey",
-    title: "Summertime Sadness",
-    src: "https://assets.aceternity.com/demos/lana-del-rey.jpeg",
+    description: "@ReactLak",
+    title: "Lakshya Jain",
+    src: lakshya,
     ctaText: "Follow",
     ctaLink: "https://ui.aceternity.com/templates",
   },
   {
-    description: "Babbu Maan",
-    title: "Mitran Di Chhatri",
-    src: "https://assets.aceternity.com/demos/babbu-maan.jpeg",
+    description: "@naman7262",
+    title: "Naman",
+    src: naman,
     ctaText: "Follow",
     ctaLink: "https://ui.aceternity.com/templates",
   },
   {
-    description: "Metallica",
-    title: "For Whom The Bell Tolls",
-    src: "https://assets.aceternity.com/demos/metallica.jpeg",
+    description: "@B1smuth",
+    title: "Siddhartha",
+    src: sid,
     ctaText: "Follow",
     ctaLink: "https://ui.aceternity.com/templates",
   },
   {
-    description: "Led Zeppelin",
-    title: "Stairway To Heaven",
-    src: "https://assets.aceternity.com/demos/led-zeppelin.jpeg",
+    description: "@shashavt",
+    title: "Shashwat Singh",
+    src: GoCute,
     ctaText: "Follow",
     ctaLink: "https://ui.aceternity.com/templates",
   },
   {
-    description: "Mustafa Zahid",
-    title: "Toh Phir Aao",
-    src: "https://assets.aceternity.com/demos/toh-phir-aao.jpeg",
+    description: "@theMatrix",
+    title: "Neo Vance",
+    src: matrix,
     ctaText: "Follow ",
     ctaLink: "https://ui.aceternity.com/templates",
   },

@@ -7,35 +7,21 @@ import Shinchan from "../../../../public/shin.png";
 import TestImg from "../../../../public/testimg.jpg";
 import Sol from "../../../../public/solana.jpg";
 import { FloatingDock } from "@/components/floating-dock";
+
 const Page = () => {
   const postsData = [
     {
       imagePost: Sol,
       imageProfile: Shinchan,
-      title: "BCCI",
+      title: "What are BLINKS?",
       content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos dis",
+        "⚡ Solana Blinks: The future of web3 interactions is here! 🌐 Seamlessly interact with Solana dApps directly from your favorite platforms. No more wallet switching or complex interfaces.",
     },
     {
       imagePost: TestImg,
       imageProfile: Shinchan,
-      title: "BCCI",
-      content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos dis",
-    },
-    {
-      imagePost: TestImg,
-      imageProfile: Shinchan,
-      title: "ICC",
-      content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos distincti.",
-    },
-    {
-      imagePost: TestImg,
-      imageProfile: Shinchan,
-      title: "BCCI",
-      content:
-        "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos distinctio veniam earum consequatur deserunt veritatis voluptas obcaecati tempora in repudiandae, laboriosam quam eveniet, quod atque doloremque, doloribus modi. Expedita, id.",
+      title: "Cat Tax",
+      content: ":) like if you love cats! 🐱",
     },
   ];
 
