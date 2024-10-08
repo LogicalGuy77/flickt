@@ -96,6 +96,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type PostData = {
   caption: string;
   imageUrl: string | null;

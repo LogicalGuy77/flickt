@@ -48,6 +48,7 @@ const Post: React.FC<PostProps> = ({
     setComment("");
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const requestAirdrop = async () => {
     if (!wallet.publicKey) {
       console.error("Wallet not connected");
