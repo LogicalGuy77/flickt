@@ -2,6 +2,7 @@
 import React from "react";
 import Profile from "../../public/shin.png";
 import Image from "next/image";
+import PhantomComponent from "./PhantomComponent";
 
 const Allinfo = () => {
   return (
@@ -19,16 +20,16 @@ const Allinfo = () => {
 
         <div className="flex flex-col justify-center">
           <div className="flex w-[30rem] items-center justify-between">
-            <h1 className="text-xl">4 posts</h1>
-            <h1 className="text-xl">329 followers</h1>
-            <h1 className="text-xl">441 following</h1>
+            <h1 className="text-xl">2 posts</h1>
+            <h1 className="text-xl">4 followers</h1>
+            <h1 className="text-xl">5 following</h1>
           </div>
           <div>
-            <h1 className="font-bold mt-5">User radar solana</h1>
+            <h1 className="font-bold mt-5">[ User Name ]</h1>
           </div>
           <div>
             <h1>
-              Wallet Address: CFesDYDHR4mTbXEdZC9YAoGcr7TFU9maN9DXVFMsKjxx
+              <PhantomComponent />
             </h1>
           </div>
         </div>
