@@ -33,7 +33,7 @@ export default function ProposalsPage() {
       </div>
 
       <div className="flex-1 flex items-center justify-center w-full">
-        <div className="w-full max-w-[1200px] p-4">
+        <div className="w-full max-w-[1200px]">
           <Poll />
         </div>
       </div>
