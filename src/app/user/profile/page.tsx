@@ -39,6 +39,7 @@ const Page = () => {
                 "https://www.canva.com/design/DAGQYnOIMzs/cyp9qNShAQqSu8ziErR-xQ/view?utm_content=DAGQYnOIMzs&utm_campaign=designshare&utm_medium=link&utm_source=editor",
             },
             { title: "Feed", icon: "🚀", href: "/user" },
+            { title: "Proposals", icon: "📒", href: "/user/proposals" },
           ]}
         />
       </div>
