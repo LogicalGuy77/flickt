@@ -26,7 +26,7 @@ export default function Poll() {
     {
       id: 1,
       question:
-        "How should DAOcial approach content moderation to balance free speech with community safety?",
+        "How should Flickt approach content moderation to balance free speech with community safety?",
       options: [
         {
           id: 1,
