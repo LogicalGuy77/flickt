@@ -27,6 +27,7 @@ interface PostProps {
   likeCount: number;
   comments: Comment[];
   onLike: () => void;
+  children?: React.ReactNode;
 }
 
 const RECIPIENT_ADDRESS = "GbhG73QyzBfgeQZwA5D7YTpATXTeZmzQRr4kss2thg4o";

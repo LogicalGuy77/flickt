@@ -25,7 +25,7 @@ const Page: React.FC = () => {
 
   const {
     accountDetails,
-    followers,
+    followers = [] as string[], // Explicitly type followers as string[]
     followed,
     posts,
     initializeAccount,
@@ -189,39 +189,56 @@ const Page: React.FC = () => {
 
       <section className="flex flex-col items-center justify-center ml-[20%] w-2/3">
         {posts.length > 0
-          ? posts.map((post, index) => (
-              <Post
-                key={index}
-                title={`Post ${post.postId}`}
-                content={post.description}
-                imagePost={post.url}
-                likeCount={Number(post.likeCount)}
-                onLike={() => handleLikePost(post.publicKey)}
-                comments={post.comments.map((comment) => ({
-                  author: comment.author.toString(),
-                  content: comment.content,
-                  timestamp: new Date(
-                    comment.timestamp.toNumber() * 1000
-                  ).toLocaleString(),
-                }))}
-              >
-                <div className="mt-4">
-                  <input
-                    type="text"
-                    placeholder="Add a comment..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="p-2 rounded w-full"
-                  />
-                  <button
-                    onClick={() => handleCommentPost(post.publicKey)}
-                    className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
-                  >
-                    Comment
-                  </button>
-                </div>
-              </Post>
-            ))
+          ? posts.map(
+              (
+                post: {
+                  postId: number;
+                  description: string;
+                  url: string;
+                  likeCount: number;
+                  publicKey: PublicKey;
+                  comments: {
+                    author: PublicKey;
+                    content: string;
+                    timestamp: number;
+                  }[];
+                },
+                index: number
+              ) => (
+                <Post
+                  key={index}
+                  title={`Post ${post.postId}`}
+                  content={post.description}
+                  imagePost={post.url}
+                  imageProfile="" // Add a valid URL or variable for the profile image
+                  likeCount={Number(post.likeCount)}
+                  onLike={() => handleLikePost(post.publicKey)}
+                  comments={post.comments.map((comment) => ({
+                    author: comment.author.toString(),
+                    content: comment.content,
+                    timestamp: new Date(
+                      comment.timestamp * 1000
+                    ).toLocaleString(),
+                  }))}
+                >
+                  <div className="mt-4">
+                    <input
+                      type="text"
+                      placeholder="Add a comment..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      className="p-2 rounded w-full"
+                    />
+                    <button
+                      onClick={() => handleCommentPost(post.publicKey)}
+                      className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+                    >
+                      Comment
+                    </button>
+                  </div>
+                </Post>
+              )
+            )
           : ""}
       </section>
       <div className="fixed top-0 right-0 h-[20%] m-5">

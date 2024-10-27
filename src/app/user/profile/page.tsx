@@ -52,6 +52,9 @@ const Page = () => {
             imagePost={post.imagePost.src}
             title={post.title}
             content={post.content}
+            likeCount={0}
+            comments={[]}
+            onLike={() => {}}
           />
         ))}
       </div>
