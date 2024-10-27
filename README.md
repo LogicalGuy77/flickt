@@ -1,5 +1,7 @@
 The smart-contract branch contains all the smart contracts used in Flickt.
 
+Alternatively also available [here](https://github.com/LogicalGuy77/flickt_idls)
+
 ## Getting Started
 
 First, run the development server:
