@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Connection, PublicKey, clusterApiUrl } from '@solana/web3.js';
-import { Program, AnchorProvider, web3 } from '@project-serum/anchor';
-import { useWallet } from '@solana/wallet-adapter-react';
-import accountIdl from '../idls/AccountIdl.json';
-import postIdl from '../idls/PostIdl.json';
+import { useState, useEffect } from "react";
+import { Connection, PublicKey, clusterApiUrl } from "@solana/web3.js";
+import { Program, AnchorProvider, web3 } from "@project-serum/anchor";
+import { useWallet } from "@solana/wallet-adapter-react";
+import accountIdl from "../idls/AccountIdl.json";
+import postIdl from "../idls/PostIdl.json";
 
 // Set the program IDs and network to devnet
 const accountProgramID = new PublicKey(accountIdl.metadata.address);
 const postProgramID = new PublicKey(postIdl.metadata.address);
-const network = clusterApiUrl('devnet');
+const network = clusterApiUrl("devnet");
 const opts = {
   preflightCommitment: "processed",
 };
@@ -30,7 +30,11 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
           wallet,
           opts.preflightCommitment
         );
-        const accountProgram = new Program(accountIdl, accountProgramID, provider);
+        const accountProgram = new Program(
+          accountIdl,
+          accountProgramID,
+          provider
+        );
         const postProgram = new Program(postIdl, postProgramID, provider);
         setAccountProgram(accountProgram);
         setPostProgram(postProgram);
@@ -49,10 +53,14 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
         [Buffer.from("account_pda"), wallet.publicKey.toBuffer()],
         accountProgram.programId
       );
-      const account = await accountProgram.account.accountDetails.fetch(accountPDA);
+      const account = await accountProgram.account.accountDetails.fetch(
+        accountPDA
+      );
       setAccountDetails(account);
       onAccountInitialized(true);
-      onOwnershipCheck(account.owner.toString() === wallet.publicKey.toString());
+      onOwnershipCheck(
+        account.owner.toString() === wallet.publicKey.toString()
+      );
 
       await fetchFollowers(account.followersPda);
       await fetchFollowed(account.followedPda);
@@ -68,19 +76,23 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
 
     try {
       const allPosts = await postProgram.account.userPost.all();
-      setPosts(allPosts.map(post => post.account));
+      setPosts(allPosts.map((post) => post.account));
     } catch (error) {
       console.error("Error fetching all posts:", error);
     }
   };
 
   const fetchFollowers = async (followersPDA) => {
-    const followers = await accountProgram.account.followersList.fetch(followersPDA);
+    const followers = await accountProgram.account.followersList.fetch(
+      followersPDA
+    );
     setFollowers(followers.followers);
   };
 
   const fetchFollowed = async (followedPDA) => {
-    const followed = await accountProgram.account.followedList.fetch(followedPDA);
+    const followed = await accountProgram.account.followedList.fetch(
+      followedPDA
+    );
     setFollowed(followed.followed);
   };
 
@@ -105,7 +117,8 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
         accountProgram.programId
       );
 
-      await accountProgram.methods.initializeAccount(name)
+      await accountProgram.methods
+        .initializeAccount(name)
         .accounts({
           accountDetails: accountPDA,
           followersList: followersPDA,
@@ -131,7 +144,8 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
         accountProgram.programId
       );
 
-      await accountProgram.methods.addFollower(new PublicKey(followerPubkey))
+      await accountProgram.methods
+        .addFollower(new PublicKey(followerPubkey))
         .accounts({
           accountDetails: accountPDA,
           followersList: accountDetails.followersPda,
@@ -154,7 +168,8 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
         accountProgram.programId
       );
 
-      await accountProgram.methods.removeFollower(new PublicKey(followerPubkey))
+      await accountProgram.methods
+        .removeFollower(new PublicKey(followerPubkey))
         .accounts({
           accountDetails: accountPDA,
           followersList: accountDetails.followersPda,
@@ -173,13 +188,18 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
 
     try {
       const [userPostPDA] = await PublicKey.findProgramAddress(
-        [Buffer.from("user_post"), wallet.publicKey.toBuffer(), Buffer.from('2')],
+        [
+          Buffer.from("user_post"),
+          wallet.publicKey.toBuffer(),
+          Buffer.from("2"),
+        ],
         postProgram.programId
       );
 
-      await postProgram.methods.createPost(description, url, postId)
+      await postProgram.methods
+        .createPost(description, url, postId)
         .accounts({
-          userPost: userPostPDA,  // Ensure this matches exactly with the PDA on-chain
+          userPost: userPostPDA, // Ensure this matches exactly with the PDA on-chain
           authority: wallet.publicKey,
           systemProgram: web3.SystemProgram.programId,
         })
@@ -195,13 +215,16 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     if (!postProgram || !wallet.publicKey) return;
 
     try {
-      await postProgram.methods.likePost()
+      await postProgram.methods
+        .likePost()
         .accounts({
           userPost: postPublicKey,
           authority: wallet.publicKey,
           from: wallet.publicKey,
           mint: new PublicKey("So11111111111111111111111111111111111111112"), // Replace with actual token mint if needed
-          tokenProgram: new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"),
+          tokenProgram: new PublicKey(
+            "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          ),
           systemProgram: web3.SystemProgram.programId,
         })
         .rpc();
@@ -216,7 +239,8 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     if (!postProgram || !wallet.publicKey) return;
 
     try {
-      await postProgram.methods.commentPost(content)
+      await postProgram.methods
+        .commentPost(content)
         .accounts({
           userPost: postPublicKey,
           authority: wallet.publicKey,
@@ -235,7 +259,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
 
     try {
       const accounts = await accountProgram.account.accountDetails.all();
-      return accounts.map(account => account.publicKey);
+      return accounts.map((account) => account.publicKey);
     } catch (error) {
       console.error("Error fetching all accounts:", error);
       return [];
