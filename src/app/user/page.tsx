@@ -1,220 +1,243 @@
-// "use client";
-// import React from "react";
-// import Starfield from "@/components/Starfield";
-// import ExpandableCardDemo from "@/components/expandable";
-// import Post from "@/components/Post";
-// import { TextRevealCard } from "@/components/TextRevealCard";
-// import Shinchan from "../../../public/shin.png";
-// import TestImg from "../../../public/testimg.jpg";
-// import Sol from "../../../public/solana.jpg";
-// import AddPostComponent from "@/components/AddPostComponent";
-// import { FloatingDock } from "@/components/floating-dock";
-// import PhantomComponent from "@/components/PhantomComponent";
-
-// const Page = () => {
-//   const postsData = [
-//     {
-//       imagePost: Sol,
-//       imageProfile: Shinchan,
-//       title: "Solana Radar",
-//       content:
-//         "Having a blast at the Solana Radar build station in Jaipur! 🤯 The energy here is incredible and I’m surrounded by so many talented people.",
-//     },
-//     {
-//       imagePost: TestImg,
-//       imageProfile: Shinchan,
-//       title: "Generative Art",
-//       content:
-//         "AI art: Where creativity meets technology. Witness the future of art, one pixel at a time.",
-//     },
-//     {
-//       imagePost: TestImg,
-//       imageProfile: Shinchan,
-//       title: "ICC",
-//       content:
-//         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos distincti.",
-//     },
-//     {
-//       imagePost: TestImg,
-//       imageProfile: Shinchan,
-//       title: "BCCI",
-//       content:
-//         "Lorem ipsum dolor sit amet consectetur adipisicing elit. Eos distinctio veniam earum consequatur deserunt veritatis voluptas obcaecati tempora in repudiandae, laboriosam quam eveniet, quod atque doloremque, doloribus modi. Expedita, id.",
-//     },
-//   ];
-
-//   return (
-//     <main className="relative flex w-full p-4 bg-black">
-//       <Starfield />
-//       <div className="fixed z-20 bottom-6 left-1/2 transform -translate-x-1/2">
-//         <FloatingDock
-//           items={[
-//             { title: "Home", icon: "🏠", href: "/" },
-//             {
-//               title: "Pitch Deck",
-//               icon: "📊",
-//               href:
-//                 "https://www.canva.com/design/DAGQYnOIMzs/cyp9qNShAQqSu8ziErR-xQ/view?utm_content=DAGQYnOIMzs&utm_campaign=designshare&utm_medium=link&utm_source=editor",
-//             },
-//             { title: "Profile", icon: "🚀", href: "/user/profile" },
-//           ]}
-//         />
-//       </div>
-//       <div className="w-[20%] h-full fixed ml-10 border-r-2 border-gray-700">
-//         <ExpandableCardDemo />
-//         <div className="flex items-center justify-center mt-7 mr-6">
-//           <AddPostComponent />
-//         </div>
-//       </div>
-
-//       <div className="flex flex-col items-center justify-center ml-[20%] w-2/3">
-//         {postsData.map((post, index) => (
-//           <Post
-//             key={index}
-//             imageProfile={post.imageProfile.src}
-//             imagePost={post.imagePost.src}
-//             title={post.title}
-//             content={post.content}
-//           />
-//         ))}
-//       </div>
-
-//       <div className="fixed top-0 right-0 h-[20%] m-5">
-//         <div className="w-[280px] mt-4">
-//           <div className="ml-auto flex translate-x-14">
-//             <PhantomComponent />
-//           </div>
-//         </div>
-//         <TextRevealCard
-//           text="NFTs"
-//           revealText="5 NFTs"
-//           className="w-[280px] mb-5"
-//         />
-//         <TextRevealCard
-//           text="Tokens"
-//           revealText="10 Token"
-//           className="w-[280px]"
-//         />
-//       </div>
-//     </main>
-//   );
-// };
-
-// export default Page;
-
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { PublicKey } from "@solana/web3.js";
 import Starfield from "@/components/Starfield";
-import ExpandableCardDemo from "@/components/expandable";
+import PhantomComponent from "@/components/PhantomComponent";
 import Post from "@/components/Post";
 import { TextRevealCard } from "@/components/TextRevealCard";
-import Shinchan from "../../../public/shin.png";
-import TestImg from "../../../public/testimg.jpg";
-import Sol from "../../../public/solana.jpg";
-import AddPostComponent from "@/components/AddPostComponent";
-import PhantomComponent from "@/components/PhantomComponent";
 import { FloatingDock } from "@/components/floating-dock";
-import { StaticImageData } from "next/image";
+import SolanaInteraction from "@/components/SolanaInteraction";
 
-const Page = () => {
-  const [postsData, setPostsData] = useState<
-    {
-      imagePost: StaticImageData | string;
-      imageProfile: StaticImageData | string;
-      title: string;
-      content: string;
-    }[]
-  >([
-    {
-      imagePost: Sol, // This is StaticImageData
-      imageProfile: Shinchan, // StaticImageData
-      title: "What are BLINKS?",
-      content:
-        "⚡ Solana Blinks: The future of web3 interactions is here! 🌐 Seamlessly interact with Solana dApps directly from your favorite platforms. No more wallet switching or complex interfaces",
-    },
-    {
-      imagePost: TestImg, // StaticImageData
-      imageProfile: Shinchan, // StaticImageData
-      title: "Cat Tax",
-      content: ":) like if you love cats! 🐱",
-    },
-    // Add more initial posts here...
-  ]);
+const Page: React.FC = () => {
+  const wallet = useWallet();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [otherUsers, setOtherUsers] = useState<string[]>([]);
+  const [newPost, setNewPost] = useState({
+    description: "",
+    url: "",
+    postId: 0,
+  });
+  const [comment, setComment] = useState("");
 
-  // Function to handle adding a new post
-  const handleAddPost = (newPost: { imagePost: string; caption: string }) => {
-    setPostsData([
-      {
-        imagePost: newPost.imagePost, // New image uploaded (as a string URL)
-        imageProfile: Shinchan, // Profile image placeholder
-        title: "New Post", // Optional title
-        content: newPost.caption, // Caption from the post
-      },
-      ...postsData, // Add new post to the top of the list
-    ]);
+  const {
+    accountDetails,
+    followers,
+    followed,
+    posts,
+    initializeAccount,
+    addFollower,
+    removeFollower,
+    createPost,
+    likePost,
+    commentPost,
+    fetchAllAccounts,
+  } = SolanaInteraction({
+    onAccountInitialized: setIsInitialized,
+    onOwnershipCheck: setIsOwner,
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (wallet.publicKey) {
+        const allAccounts = await fetchAllAccounts();
+        const otherUserAddresses = allAccounts
+          .filter(
+            (account) => account.toString() !== wallet.publicKey?.toString()
+          )
+          .map((account) => account.toString());
+        setOtherUsers(otherUserAddresses);
+      }
+    };
+    fetchData();
+  }, [wallet.publicKey]);
+
+  const handleAddPost = async () => {
+    if (isOwner) {
+      await createPost(newPost.description, newPost.url, newPost.postId);
+      setNewPost({ description: "", url: "", postId: newPost.postId + 1 });
+    }
   };
 
+  const handleLikePost = async (postPublicKey: PublicKey) => {
+    await likePost(postPublicKey);
+  };
+
+  const handleCommentPost = async (postPublicKey: PublicKey) => {
+    if (comment.trim()) {
+      await commentPost(postPublicKey, comment);
+      setComment("");
+    }
+  };
+
+  const handleInitializeAccount = async () => {
+    const name = prompt("Enter your name to initialize your account:");
+    if (name) {
+      await initializeAccount(name);
+    }
+  };
+
+  const handleFollowUnfollow = async (pubkey: string) => {
+    if (followers.includes(pubkey)) {
+      await removeFollower(pubkey);
+    } else {
+      await addFollower(pubkey);
+    }
+  };
+
+  if (!wallet.connected) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-black text-white">
+        <p className="mb-4">Please connect your wallet to continue.</p>
+        <WalletMultiButton />
+      </div>
+    );
+  }
+
+  if (!isInitialized) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+        <button
+          onClick={handleInitializeAccount}
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Initialize Account
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <main className="relative flex w-full p-4 bg-black">
+    <main className="relative flex w-full min-h-screen p-4 bg-black">
       <Starfield />
       <div className="fixed z-20 bottom-6 left-1/2 transform -translate-x-1/2">
         <FloatingDock
           items={[
             { title: "Home", icon: "🏠", href: "/" },
+            { title: "Profile", icon: "🚀", href: "/user/profile" },
             {
               title: "Pitch Deck",
               icon: "📊",
               href:
                 "https://www.canva.com/design/DAGQYnOIMzs/cyp9qNShAQqSu8ziErR-xQ/view?utm_content=DAGQYnOIMzs&utm_campaign=designshare&utm_medium=link&utm_source=editor",
             },
-            { title: "Profile", icon: "🚀", href: "/user/profile" },
-            { title: "Proposals", icon: "📒", href: "/user/proposals" },
           ]}
         />
       </div>
-      <div className="w-[20%] h-full fixed ml-10 border-r-2 border-gray-700">
-        <ExpandableCardDemo />
-        <div className="flex items-center justify-center mt-7 mr-6">
-          <AddPostComponent onAddPost={handleAddPost} />
-        </div>
-      </div>
 
-      <div className="flex flex-col items-center justify-center ml-[20%] w-2/3">
-        {postsData.map((post, index) => (
-          <Post
-            key={index}
-            imageProfile={
-              typeof post.imageProfile === "string"
-                ? post.imageProfile
-                : post.imageProfile.src
-            } // Extract src if it's StaticImageData
-            imagePost={
-              typeof post.imagePost === "string"
-                ? post.imagePost
-                : post.imagePost.src
-            } // Extract src if it's StaticImageData
-            title={post.title}
-            content={post.content}
-          />
-        ))}
-      </div>
-
-      <div className="fixed top-0 right-0 h-[20%] m-5">
-        <div className="w-[280px] mt-4">
-          <div className="ml-auto flex translate-x-14">
-            <PhantomComponent />
+      <aside className="fixed ml-10 w-[20%] min-h-screen border-r-2 border-gray-700">
+        {/* <ExpandableCardDemo /> */}
+        <div className="mt-7 mr-6">
+          {isOwner && (
+            <div className="mb-6">
+              <h3 className="text-white mb-2">Create a Post:</h3>
+              <input
+                type="text"
+                placeholder="Description"
+                value={newPost.description}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, description: e.target.value })
+                }
+                className="mb-2 p-2 rounded w-full"
+              />
+              <input
+                type="text"
+                placeholder="URL"
+                value={newPost.url}
+                onChange={(e) =>
+                  setNewPost({ ...newPost, url: e.target.value })
+                }
+                className="mb-2 p-2 rounded w-full"
+              />
+              <button
+                onClick={handleAddPost}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+              >
+                Add Post
+              </button>
+            </div>
+          )}
+          <div>
+            <h3 className="text-white font-bold mb-2">Other Users:</h3>
+            {otherUsers.map((pubkey, index) => (
+              <div
+                key={index}
+                className="flex items-center justify-between mb-2"
+              >
+                <span className="text-white">{pubkey.slice(0, 8)}...</span>
+                <button
+                  onClick={() => handleFollowUnfollow(pubkey)}
+                  className={`px-2 py-1 rounded ${
+                    followers.includes(pubkey)
+                      ? "bg-red-500 hover:bg-red-700"
+                      : "bg-green-500 hover:bg-green-700"
+                  } text-white text-sm`}
+                >
+                  {followers.includes(pubkey) ? "Unfollow" : "Follow"}
+                </button>
+              </div>
+            ))}
           </div>
         </div>
-        <TextRevealCard
-          text="NFTs"
-          revealText="5 NFTs"
-          className="w-[280px] mb-5"
-        />
-        <TextRevealCard
-          text="Tokens"
-          revealText="10 Token"
-          className="w-[280px]"
-        />
+      </aside>
+
+      <section className="flex flex-col items-center justify-center ml-[20%] w-2/3">
+        {posts.length > 0
+          ? posts.map((post, index) => (
+              <Post
+                key={index}
+                title={`Post ${post.postId}`}
+                content={post.description}
+                imagePost={post.url}
+                likeCount={Number(post.likeCount)}
+                onLike={() => handleLikePost(post.publicKey)}
+                comments={post.comments.map((comment) => ({
+                  author: comment.author.toString(),
+                  content: comment.content,
+                  timestamp: new Date(
+                    comment.timestamp.toNumber() * 1000
+                  ).toLocaleString(),
+                }))}
+              >
+                <div className="mt-4">
+                  <input
+                    type="text"
+                    placeholder="Add a comment..."
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    className="p-2 rounded w-full"
+                  />
+                  <button
+                    onClick={() => handleCommentPost(post.publicKey)}
+                    className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full"
+                  >
+                    Comment
+                  </button>
+                </div>
+              </Post>
+            ))
+          : ""}
+      </section>
+      <div className="fixed top-0 right-0 h-[20%] m-5">
+        <div className="w-[280px] mt-4">
+          <div className="ml-auto flex translate-x-16">
+            <PhantomComponent /> {/* This is where your button is located */}
+          </div>
+        </div>
+        <div className="fixed z-20 bottom-6">
+          <TextRevealCard
+            text="NFTs"
+            revealText="5 NFTs"
+            className="w-[280px] mb-5"
+          />
+          <TextRevealCard
+            text="Tokens"
+            revealText="10 Token"
+            className="w-[280px]"
+          />
+        </div>
       </div>
     </main>
   );

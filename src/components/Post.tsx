@@ -13,11 +13,20 @@ import {
 } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 
+interface Comment {
+  author: string;
+  content: string;
+  timestamp: string;
+}
+
 interface PostProps {
   imageProfile: string;
   imagePost: string;
   title: string;
   content: string;
+  likeCount: number;
+  comments: Comment[];
+  onLike: () => void;
 }
 
 const RECIPIENT_ADDRESS = "GbhG73QyzBfgeQZwA5D7YTpATXTeZmzQRr4kss2thg4o";
@@ -27,6 +36,9 @@ const Post: React.FC<PostProps> = ({
   imagePost,
   title,
   content,
+  likeCount,
+  comments = [],
+  onLike,
 }) => {
   const [isClick, setClick] = useState(false);
   const [comment, setComment] = useState("");
@@ -48,25 +60,6 @@ const Post: React.FC<PostProps> = ({
     setComment("");
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const requestAirdrop = async () => {
-    if (!wallet.publicKey) {
-      console.error("Wallet not connected");
-      return;
-    }
-
-    try {
-      const airdropSignature = await connection.requestAirdrop(
-        wallet.publicKey,
-        LAMPORTS_PER_SOL
-      );
-      await connection.confirmTransaction(airdropSignature);
-      console.log("Airdrop of 1 SOL successful");
-    } catch (error) {
-      console.error("Error requesting airdrop:", error);
-    }
-  };
-
   const handleLikeClick = async () => {
     if (!wallet.publicKey || !wallet.signTransaction) {
       console.error("Wallet not connected");
@@ -86,7 +79,6 @@ const Post: React.FC<PostProps> = ({
         })
       );
 
-      // Fetch latest blockhash using the new method
       const {
         blockhash,
         lastValidBlockHeight,
@@ -101,7 +93,6 @@ const Post: React.FC<PostProps> = ({
 
       console.log("Transaction sent, awaiting confirmation");
 
-      // Confirm the transaction using lastValidBlockHeight
       await connection.confirmTransaction({
         signature: txid,
         blockhash,
@@ -110,6 +101,7 @@ const Post: React.FC<PostProps> = ({
 
       console.log("Transaction confirmed on devnet:", txid);
 
+      onLike();
       setClick(!isClick);
     } catch (error) {
       console.error("Error sending transaction on devnet:", error);
@@ -148,12 +140,13 @@ const Post: React.FC<PostProps> = ({
           //@ts-expect-error - Fix this by adding the correct type for the style prop
           disabled={isSendingTransaction || !wallet.connected}
         />
-        {/* {isSendingTransaction && <span className="ml-2">Sending 0.5 SOL on devnet...</span>} */}
+        <span className="ml-2">{likeCount} likes</span>
+
         <textarea
           name="comment"
           id="comment"
           className="bg-transparent border-2 border-gray-50 rounded-full h-10 w-[70%] p-1.5 overflow-hidden"
-          placeholder="comment"
+          placeholder="Add a comment..."
           value={comment}
           onChange={handleCommentChange}
         />
@@ -166,12 +159,16 @@ const Post: React.FC<PostProps> = ({
           Comment
         </button>
       </div>
-      {/* <button 
-        onClick={requestAirdrop}
-        className='bg-green-500 text-white rounded-full px-3 py-1 mt-2'
-      >
-        Request Devnet SOL
-      </button> */}
+
+      <div className="mt-4">
+        {comments.map((comment, index) => (
+          <div key={index} className="flex flex-col mt-2">
+            <span className="font-bold">{comment.author}</span>
+            <span className="text-sm">{comment.timestamp}</span>
+            <p>{comment.content}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
