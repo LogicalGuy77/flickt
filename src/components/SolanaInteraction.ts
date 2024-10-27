@@ -5,6 +5,27 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import accountIdl from "../idls/AccountIdl.json";
 import postIdl from "../idls/PostIdl.json";
 
+// Define interfaces for the account and post structures
+interface AccountDetails {
+  owner: PublicKey;
+  followersPda: PublicKey;
+  followedPda: PublicKey;
+  name: string;
+}
+
+interface UserPost {
+  description: string;
+  url: string;
+  postId: string;
+  likes: number;
+  comments: string[];
+}
+
+interface SolanaInteractionProps {
+  onAccountInitialized: (initialized: boolean) => void;
+  onOwnershipCheck: (isOwner: boolean) => void;
+}
+
 // Set the program IDs and network to devnet
 const accountProgramID = new PublicKey(accountIdl.metadata.address);
 const postProgramID = new PublicKey(postIdl.metadata.address);
@@ -13,14 +34,19 @@ const opts = {
   preflightCommitment: "processed",
 };
 
-const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
+const SolanaInteraction = ({
+  onAccountInitialized,
+  onOwnershipCheck,
+}: SolanaInteractionProps) => {
   const wallet = useWallet();
-  const [accountProgram, setAccountProgram] = useState(null);
-  const [postProgram, setPostProgram] = useState(null);
-  const [accountDetails, setAccountDetails] = useState(null);
-  const [followers, setFollowers] = useState([]);
-  const [followed, setFollowed] = useState([]);
-  const [posts, setPosts] = useState([]);
+  const [accountProgram, setAccountProgram] = useState<Program | null>(null);
+  const [postProgram, setPostProgram] = useState<Program | null>(null);
+  const [accountDetails, setAccountDetails] = useState<AccountDetails | null>(
+    null
+  );
+  const [followers, setFollowers] = useState<PublicKey[]>([]);
+  const [followed, setFollowed] = useState<PublicKey[]>([]);
+  const [posts, setPosts] = useState<UserPost[]>([]);
 
   useEffect(() => {
     const initializePrograms = async () => {
@@ -45,7 +71,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     initializePrograms();
   }, [wallet.publicKey]);
 
-  const fetchAccountDetails = async () => {
+  const fetchAccountDetails = async (): Promise<void> => {
     if (!accountProgram || !wallet.publicKey) return;
 
     try {
@@ -56,7 +82,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
       const account = await accountProgram.account.accountDetails.fetch(
         accountPDA
       );
-      setAccountDetails(account);
+      setAccountDetails(account as AccountDetails);
       onAccountInitialized(true);
       onOwnershipCheck(
         account.owner.toString() === wallet.publicKey.toString()
@@ -71,32 +97,32 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const fetchAllPosts = async () => {
+  const fetchAllPosts = async (): Promise<void> => {
     if (!postProgram) return;
 
     try {
       const allPosts = await postProgram.account.userPost.all();
-      setPosts(allPosts.map((post) => post.account));
+      setPosts(allPosts.map((post) => post.account) as UserPost[]);
     } catch (error) {
       console.error("Error fetching all posts:", error);
     }
   };
 
-  const fetchFollowers = async (followersPDA) => {
-    const followers = await accountProgram.account.followersList.fetch(
+  const fetchFollowers = async (followersPDA: PublicKey): Promise<void> => {
+    const followers = await accountProgram?.account.followersList.fetch(
       followersPDA
     );
-    setFollowers(followers.followers);
+    setFollowers(followers?.followers || []);
   };
 
-  const fetchFollowed = async (followedPDA) => {
-    const followed = await accountProgram.account.followedList.fetch(
+  const fetchFollowed = async (followedPDA: PublicKey): Promise<void> => {
+    const followed = await accountProgram?.account.followedList.fetch(
       followedPDA
     );
-    setFollowed(followed.followed);
+    setFollowed(followed?.followed || []);
   };
 
-  const initializeAccount = async (name) => {
+  const initializeAccount = async (name: string): Promise<void> => {
     if (!accountProgram || !wallet.publicKey) return;
 
     try {
@@ -135,7 +161,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const addFollower = async (followerPubkey) => {
+  const addFollower = async (followerPubkey: string): Promise<void> => {
     if (!accountProgram || !wallet.publicKey || !accountDetails) return;
 
     try {
@@ -159,7 +185,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const removeFollower = async (followerPubkey) => {
+  const removeFollower = async (followerPubkey: string): Promise<void> => {
     if (!accountProgram || !wallet.publicKey || !accountDetails) return;
 
     try {
@@ -183,7 +209,11 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const createPost = async (description, url, postId) => {
+  const createPost = async (
+    description: string,
+    url: string,
+    postId: string
+  ): Promise<void> => {
     if (!postProgram || !wallet.publicKey) return;
 
     try {
@@ -199,7 +229,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
       await postProgram.methods
         .createPost(description, url, postId)
         .accounts({
-          userPost: userPostPDA, // Ensure this matches exactly with the PDA on-chain
+          userPost: userPostPDA,
           authority: wallet.publicKey,
           systemProgram: web3.SystemProgram.programId,
         })
@@ -211,7 +241,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const likePost = async (postPublicKey) => {
+  const likePost = async (postPublicKey: PublicKey): Promise<void> => {
     if (!postProgram || !wallet.publicKey) return;
 
     try {
@@ -221,7 +251,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
           userPost: postPublicKey,
           authority: wallet.publicKey,
           from: wallet.publicKey,
-          mint: new PublicKey("So11111111111111111111111111111111111111112"), // Replace with actual token mint if needed
+          mint: new PublicKey("So11111111111111111111111111111111111111112"),
           tokenProgram: new PublicKey(
             "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
           ),
@@ -235,7 +265,10 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const commentPost = async (postPublicKey, content) => {
+  const commentPost = async (
+    postPublicKey: PublicKey,
+    content: string
+  ): Promise<void> => {
     if (!postProgram || !wallet.publicKey) return;
 
     try {
@@ -254,7 +287,7 @@ const SolanaInteraction = ({ onAccountInitialized, onOwnershipCheck }) => {
     }
   };
 
-  const fetchAllAccounts = async () => {
+  const fetchAllAccounts = async (): Promise<PublicKey[]> => {
     if (!accountProgram) return [];
 
     try {
