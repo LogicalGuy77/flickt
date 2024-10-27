@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import React, { useState, useEffect } from "react";
+import { PublicKey } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import { PublicKey } from "@solana/web3.js";
@@ -43,12 +44,15 @@ const Page: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (wallet.publicKey) {
-        const allAccounts = await fetchAllAccounts();
+        const allAccounts: PublicKey[] = await fetchAllAccounts(); // Specify the type of allAccounts
+
         const otherUserAddresses = allAccounts
           .filter(
-            (account) => account.toString() !== wallet.publicKey?.toString()
+            (account: PublicKey) =>
+              account.toString() !== wallet.publicKey?.toString()
           )
-          .map((account) => account.toString());
+          .map((account: PublicKey) => account.toString());
+
         setOtherUsers(otherUserAddresses);
       }
     };
