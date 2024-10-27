@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { PublicKey } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { PublicKey } from "@solana/web3.js";
 import Starfield from "@/components/Starfield";
 import PhantomComponent from "@/components/PhantomComponent";
 import Post from "@/components/Post";
